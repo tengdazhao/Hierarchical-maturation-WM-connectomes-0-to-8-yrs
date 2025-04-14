@@ -1,0 +1,20 @@
+clear all
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% The following variates are needed to be loaded before performing each analysis step (step2-step6).
+
+% set working paths
+Pathnew=['D:\Documents\OneDrive - bnu.edu.cn\My_publications\0-8yearspaper\Forsubmission2025\'];% basic dir
+statdir=[Pathnew,'Forgithub\Code'];
+savedir=[Pathnew,'Forgithub'];
+Pathnewplot=[Pathnew,'Forgithub'];
+
+% load brain surface for brain plotings
+BNVsurfacetemplate=[Pathnew,'Forgithub\Data','\BrainMesh_ICBM152_smoothed.nv'];
+
+% load coordinates and name for brain nodes
+Pathnewxsl=[Pathnew,'Forgithub\Data\Atlas\500atlas.xlsx'];
+
+% load individual network and covariates
+load([Pathnew,'Forgithub\Data\Network\Matrixallpar500FN.mat']);
+load([Pathnew,'Forgithub\Data\Cov\Age_gender_brainsize.mat']) 
+load([Pathnew,'Forgithub\Data\Atlas\Her3name.mat']) 
