@@ -54,7 +54,7 @@ Custom code and toolboxes were tested on a 64-bit Windows 11 PC (Intel Core i9-1
    Finally, some supporting data for visualization (option files for BrainNet Viewer) can be found in Code\opt.
 
 
-   ## References
+   ## References：
    1.	R. F. Betzel, A. Griffa, P. Hagmann, B. Mišić, Distance-dependent consensus thresholds for generating group-representative structural brain networks. Network neuroscience 3, 475-496 (2019).
    2.	A. F. Alexander-Bloch et al., On testing for spatial correspondence between maps of human brain structure and function. Neuroimage 178, 540-551 (2018).
    3.	Z. Cui, G. Gong, The effect of machine learning regression algorithms and sample size on individualized behavioral prediction with functional connectivity features. Neuroimage 178, 622-637 (2018).
