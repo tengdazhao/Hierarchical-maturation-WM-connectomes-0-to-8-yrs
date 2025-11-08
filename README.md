@@ -41,7 +41,7 @@ Contents include standalone software, source code, and demo data. All data neces
 Custom code and toolboxes were tested on a 64-bit Windows 11 PC (Intel Core i9-12900K 64 RAM). Data analysis was performed using Matlab 2020b, Python 3.7.0, and R 4.0.3. We thank the authors and developers for providing these data analysis tools.
 
    ## Data：
-   All data are available in Releases (https://github.com/tengdazhao/Hierarchical-maturation-WM-connectomes-0-to-8-yrs).
+   All data（Subset 1 and Subset 2）are available in Releases (https://github.com/tengdazhao/Hierarchical-maturation-WM-connectomes-0-to-8-yrs).
    
    We provided **individual WM networks, graph-theoretical attributes, regional microstructural indexes** for all scans of 0 to 8 yrs at the highest node resolution (500 nodes).
 
@@ -63,3 +63,5 @@ Custom code and toolboxes were tested on a 64-bit Windows 11 PC (Intel Core i9-1
    6.	R. D. Markello et al., neuromaps: structural and functional interpretation of brain maps. Nat. Methods 19, 1472-1479 (2022).
    7.	Shrout PE, Bolger N, Mediation in experimental and nonexperimental studies: New procedures and recommendations. Psychol Methods 7:422–445 (2002).
    8.	M. Xia, J. Wang, Y. He, BrainNet Viewer: a network visualization tool for human brain connectomics. PloS one 8, e68910 (2013).
+
+
