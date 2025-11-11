@@ -50,7 +50,7 @@ set(gcf,'Color',[1 1 1]) ;
 set(gcf,'position', [1 30 950 715]);
 set(gca,'position',[ 0.23    0.22   0.71    0.74]);
 hold on;
-plot(data2,sca,'o','LineWidth',2,'MarkerFaceColor',[0 0 0],'MarkerSize',12,'MarkerEdgeColor',[0 0 0])
+plot(data2,sca,'o','LineWidth',2,'MarkerFaceColor',[0 0 0],'MarkerSize',9,'MarkerEdgeColor',[0 0 0])
 plot(ax,line,'k','LineWidth',8,'LineStyle','-','color',[216/255    41/255    0/255])
 xlabel(xlabeln);
 ylabel(ylabeln);
@@ -80,9 +80,16 @@ end
     
 % set(gca,'ytick',[str2double(char(vpa(min(sca),2))),str2double(char(vpa(round((max(sca)-min(sca))/2+min(sca)),2))),str2double(char(vpa(max(sca),2)))]); 
 % set(gca,'xtick',[str2double(char(vpa(min(data2),2))),str2double(char(vpa(round((max(data2)-min(data2))/2+min(data2)),2))),str2double(char(vpa(max(data2),2)))]); 
-
+try
 set(gca,'ytick',[str2double(char(vpa(min(sca),3))),str2double(char(vpa(round_tempstry,3))),str2double(char(vpa(max(sca),3)))]); 
+catch ME
+    disp('Warning: ytick 设置失败，已跳过该行。');
+end
+try
 set(gca,'xtick',[str2double(char(vpa(min(data2),3))),str2double(char(vpa(round_tempstrx,3))),str2double(char(vpa(max(data2),3)))]); 
+catch ME
+    disp('Warning: ytick 设置失败，已跳过该行。');
+end
 % 
 if ~isempty(ytk)
 set(gca,'ytick',ytk,'yticklabel',ytklabel); 
@@ -90,8 +97,8 @@ set(gca,'xtick',xtk,'xticklabel',xtklabel);
 end
 hold on;
 % set(gca,'ytick',[20 40 60 80]);
-text(min(data2)+(max(data2)-min(data2))/2.6,max(sca)+(max(sca)-min(sca))/5, pstr,'FontWeight','bold','FontSize',40);
-text(min(data2)-(max(data2)-min(data2))/22,max(sca)+(max(sca)-min(sca))/5.5, rstr,'FontWeight','bold','FontSize',40);
+text(min(data2)+(max(data2)-min(data2))/2.6,max(sca)+(max(sca)-min(sca))/4, pstr,'FontWeight','bold','FontSize',40);
+text(min(data2)-(max(data2)-min(data2))/22,max(sca)+(max(sca)-min(sca))/4, rstr,'FontWeight','bold','FontSize',40);
 hold on;
 set(gca,'fontsize',40,'LineWidth',5,'FontWeight','bold');
 set(gcf, 'PaperPositionMode', 'auto'); 

@@ -1,4 +1,4 @@
-function [FourModelsigthre]=arrange_nodal_Slope(indminNodalStrmdall,indminNodalindre,notenoughNodalStr,Pathnew,opt,scale,Pathnewplot,pthretype,result_name)
+function [FourModelsigthre]=arrange_nodal_Slope(Nodal_metric,indminNodalStrmdall,indminNodalindre,notenoughNodalStr,Pathnew,opt,scale,Pathnewplot,pthretype,result_name)
 %reorder
 roi_num=length(indminNodalindre);
 edges=zeros(roi_num,roi_num);
@@ -72,6 +72,7 @@ length(indnodes)
 % FourModelsigthre{1,2}=indnodes;
 % FourModelsigthre{1,3}=reompr4thre1(1,:,indnodes);
 load([Pathnew(1:end-14),'\Her3name.mat']);
+%load([Pathnew(1:end-14),'\Her3nameR2.mat']);
 PerHer4=[];
 for i=1:max(AALHer4(:,2))
     tempm=allm(find(AALHer4(:,2)==i));   
@@ -181,6 +182,7 @@ set(gca,'YTick',(1:1:4),'YTickLabel',[sysname(1,numone)]);
 set(gcf, 'PaperPositionMode', 'auto');set(gca, 'fontsize',20,'LineWidth',0.1,'FontWeight','bold');
 print(gcf,'-dtiff','-r300',[result_namethre 'PerHer4Num.tif']); close all;
 
+[xx numone]=sort(PerHer4(:,1),'descend');
 %Her4numonefinal=flip(numone);
 pHer4new=pHer4(numone,numone);
 figure;
@@ -237,9 +239,10 @@ llw=1;
 barh(PerVonEnew(:,1)+PerVonEnew(:,2)+PerVonEnew(:,3),'FaceColor',[0.89 0.89 0.89],'LineWidth',llw);hold on;barh(PerVonEnew(:,1)+PerVonEnew(:,2),'FaceColor',[237/255 176/255 33/255],'LineWidth',llw);hold on;barh(PerVonEnew(:,1),'FaceColor',[70/255 171/255,215/255],'LineWidth',llw);
 set(gca,'YTick',(1:1:7),'YTickLabel',[sysname(2,numone)]);
 set(gcf, 'PaperPositionMode', 'auto');set(gca, 'fontsize',20,'FontWeight','bold');
-axis off
+%axis off
 print(gcf,'-dtiff','-r300',[result_namethre 'PerVonENumtif']); close all;
 
+[xx numone]=sort(PerVonE(:,1),'descend');
 %VonEnumonefinal=flip(numone);
 pVonEnew=pVonE(numone,numone);
 pVonEplot=-log(pVonEnew);
@@ -298,6 +301,7 @@ set(gcf, 'PaperPositionMode', 'auto');set(gca, 'fontsize',20,'LineWidth',0.1,'Fo
 print(gcf,'-dtiff','-r300',[result_namethre '_PerYeoNum.tif']); close all;
 
 %Yeonumonefinal=flip(numone);
+[xx numone]=sort(PerYeo(:,1),'descend');
 pVonYeonew=pVonYeo(numone,numone);
 figure;
 pYeoEplot=-log(pVonYeonew);
@@ -353,8 +357,14 @@ print(gcf,'-dtiff','-r300',[result_namethre 'NoPerYeoPCirclemap.tif']); close al
 
 intersectionAge=[];Gradeintsall=[];Index2all=[];Mean_rapid_slope=[];;intersectionpointall=[];Median_rapid_slope=[];
 for i=1:length(indnodes);
+    try
     md4plot=indminNodalStrmdall{indnodes(i)}{1,1}{1,reompr4thre1(1,1,indnodes(i))};
     fitresult=indminNodalStrmdall{indnodes(i)}{1,1}{2,reompr4thre1(1,1,indnodes(i))};
+    catch
+    md4plot=indminNodalStrmdall{indnodes(i)}{1,reompr4thre1(1,1,indnodes(i))};
+    fitresult=indminNodalStrmdall{indnodes(i)}{2,reompr4thre1(1,1,indnodes(i))};
+    end
+    
     tbl=md4plot.Variables;%Using fit to constrain the lower boundary of beta2 above ZERO (Or the model will be failed).
     Data_rremain=tbl.data_r-md4plot.Coefficients.Estimate(1)-(md4plot.Coefficients.Estimate(end-1).*tbl.Gender)-(md4plot.Coefficients.Estimate(end).*tbl.BrainSize);
     Data_rremain = Data_rremain+(mean(tbl.data_r)-mean(Data_rremain));
@@ -377,7 +387,8 @@ for i=1:length(indnodes);
     Fp=(Ypoint)-Index2;
     Fp(find(Fp>0))=1;Fp(find(Fp<0))=-1;
     dffFp=diff(Fp);
-    intersectionpointall(i)=find(dffFp~=0);
+    difftemp=find(dffFp~=0);
+    intersectionpointall(i)=difftemp(1);
     intersectionAge(i)=Age2(intersectionpointall(i));
     Mean_rapid_slope(i)=mean(Gradeintsall(i,1:intersectionpointall(i)));
     Median_rapid_slope(i)=mean(Gradeintsall(i,1:intersectionpointall(i)));
@@ -410,17 +421,32 @@ Gradeintsallplot=Gradeintsall;
 %opt=[Pathnewplot,'\Slpoptnew.mat'];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%slope brain nodes stats
+load(['Her3name.mat']);
+InterAgeSys=[];
+for i=1:max(AALVonE(:,2))
+    indsyssiginnodes=[];
+    indsys=find(AALVonE(:,2)==i);  
+    indsyssig=intersect(indnodes,indsys);
+    for iii=1:length(indsyssig);indsyssiginnodes(iii)=find(indnodes==indsyssig(iii));end
+    InterAgeSys{1,i}=intersectionAge(indsyssiginnodes)';
+end
+
+
+InterAgeSysAsso=[InterAgeSys{2}; InterAgeSys{3}; InterAgeSys{7};];
+InterAgeSysPri=[InterAgeSys{1}; InterAgeSys{4}; InterAgeSys{5};InterAgeSys{6}];
+
 %slope brain nodes plot
 
 sizenode(indnodes)=reompr4thre1(3,1,indnodes);
 colornode(indnodes)=intersectionAge;
-plotnode(colornode,sizenode,edges,Pathnew,opt,scale,Pathnewplot,[result_namethre,'MaturationAge']);
+%plotnode(colornode,sizenode,edges,Pathnew,opt,scale,Pathnewplot,[result_namethre,'MaturationAge']);
 sizenode(indnodes)=reompr4thre1(3,1,indnodes);
 colornode(indnodes)=Mean_rapid_slope;
 plotnode(colornode,sizenode,edges,Pathnew,opt,scale,Pathnewplot,[result_namethre,'mean_slope']);
 sizenode(indnodes)=reompr4thre1(3,1,indnodes);
 colornode(indnodes)=Median_rapid_slope;
-plotnode(colornode,sizenode,edges,Pathnew,opt,scale,Pathnewplot,[result_namethre,'mediation_slope']);
+%plotnode(colornode,sizenode,edges,Pathnew,opt,scale,Pathnewplot,[result_namethre,'mediation_slope']);
 for ii=1:length(Fitted_Subgroup)
 %for ii=4
 colornode(indnodes)=Gradeintsallplot(:,Fitted_Subgroup(ii));
@@ -467,7 +493,7 @@ tempcolornodeplot=tempcolornode(indcalltogether,:);
 tempcolornodeplot=tempcolornodeall(indcalltogether,:);
 tempageallplot=tempageall(indcalltogether,:);
 
-figure;imagesc(tempcolornodeplot);clim([0.000001 5.5]);hold on; 
+figure;imagesc(tempcolornodeplot.*tempcolornodeplot);caxis([0.000001 12]);hold on; 
 %axis equal;
 colormap(myslopecmap);
 colorbar;
@@ -511,7 +537,7 @@ tempcolornodeplot=tempcolornode(indcalltogether,:);
 tempcolornodeplot=tempcolornodeall(indcalltogether,:);
 tempageallplot=tempageall(indcalltogether,:);
 
-figure;imagesc(tempcolornodeplot);clim([0.000001 5.5]);hold on; 
+figure;imagesc(tempcolornodeplot);caxis([0.000001 5.5]);hold on; 
 %axis equal;
 colormap(myslopecmap);
 colorbar;
@@ -538,9 +564,112 @@ print(gcf,'-dtiff','-r300',[result_name 'SlopeYeoc_MA_FDRnn.tif']); close all;
 %VonE system slope stats 
 pVonEplotall=[];
 [xx numone]=sort(PerVonE(:,1),'descend');
+% 
+% for agei=1:length(Gradeintsall);
+% %for agei=length(Gradeintsall);
+% colornode(indnodes)=Gradeintsall(:,agei);
+% colornodemean=zeros(500,1);colornodemediation=zeros(500,1);
+% colornodemean(indnodes)=Mean_rapid_slope;
+% colornodemediation(indnodes)=Median_rapid_slope;
+% 
+% 
+% PerVonEslop=[];PerVonEmslop=[];PerVonEmdslop=[];
+% for i=1:max(AALVonE(:,2))
+%     tempm=allm(find(AALVonE(:,2)==i));  
+%     tempp=allp(find(AALVonE(:,2)==i)); 
+%     tempslope=colornode(find(AALVonE(:,2)==i));
+%     tempmSig=tempslope(find(tempp<=pthref)); 
+%     tempslopem=colornodemean(find(AALVonE(:,2)==i));
+%     tempmSigm=tempslopem(find(tempp<=pthref)); 
+%     tempslopemd=colornodemediation(find(AALVonE(:,2)==i));
+%     tempmSigmd=tempslopemd(find(tempp<=pthref)); 
+%     PerVonEslop{i}=tempmSig;
+%     PerVonEmslop{i}=tempmSigm;
+%     PerVonEmdslop{i}=tempmSigmd;
+% end
+% 
+% 
+% pVonE=[];QVon=[]; pVonEm=[];QVonm=[]; pVonEmd=[];QVonmd=[];
+% for  it=1:7;
+%     for jt=1:7;
+%         if(it~=jt)
+%     [pVonE(it,jt,agei), QVon(it,jt,agei)]= ranksum(PerVonEslop{1,it},PerVonEslop{1,jt});
+%         [pVonEm(it,jt,agei), QVonm(it,jt,agei)]= ranksum(PerVonEmslop{1,it},PerVonEmslop{1,jt});
+%             [pVonEmd(it,jt,agei), QVonmd(it,jt,agei)]= ranksum(PerVonEmdslop{1,it},PerVonEmdslop{1,jt});
+%         else
+%           pVonE(it,jt,agei)=999;  QVon(it,jt,agei)=999;
+%                     pVonEm(it,jt,agei)=999;  QVonm(it,jt,agei)=999;
+%                               pVonEmd(it,jt,agei)=999;  QVonmd(it,jt,agei)=999;
+%         end
+%     end
+% end
+% 
+% 
+% pVonEnew=pVonE(numone,numone,agei);
+% pVonEplot=-log(pVonEnew);
+% pVonEplot(find(pVonEnew==999))=0;
+% pVonEmnew=pVonEm(numone,numone,agei);
+% pVonEmplot=-log(pVonEmnew);
+% pVonEmplot(find(pVonEmnew==999))=0;
+% pVonEmdnew=pVonEmd(numone,numone,agei);
+% pVonEmdplot=-log(pVonEmdnew);
+% pVonEmdplot(find(pVonEmdnew==999))=0;
+% pall=[];
+% pall=pVonEnew(intersect((find(triu(pVonEnew)>0)),(find(triu(pVonEnew)<1))));
+% [pmmfdr1 pmmfdr2]=gretna_FDR(pall,0.05);
+% if(isempty(pmmfdr1))
+%     pVonEplot=zeros(size(numone,1),size(numone,1));
+% else
+% pVonEplot(find(pVonEnew>=(pmmfdr1)))=0;
+% end
+% pVonEplotall(:,:,agei)=pVonEplot;
+% pVonEmplotall(:,:,agei)=pVonEmplot;
+% pVonEmdplotall(:,:,agei)=pVonEmdplot;
+% pVonEmnewall(:,:,agei)=pVonEmnew;
+% pVonEmdnewall(:,:,agei)=pVonEmdnew;
+% end
+% 
+% 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %VonE system slope stats  Pmap plot
+% % 创建一个示例的 3D 密度分布矩阵，这里用随机数据代替
+% density_matrix = pVonEplotall(:,:,1:end);
+% density_matrixnew=[];
+% for i=1:length(density_matrix)
+%     density_matrixnew(:,:,i)=density_matrix(:,:,(length(density_matrix)-i)+1);
+% end
+% % 创建一个新的 figure
+% figure;
+% 
+% % 创建切片图像
+% h = slice(density_matrixnew, [], [], 1:size(density_matrixnew, 3));
+% 
+% % 设置绘图属性和标签
+% zlabel('Age');
+% set(gca,'XTick',[1:1:length(sysname(2,numone))],'XTickLabel',[sysname(2,numone)]);
+% set(gca,'YTick',[1:1:length(sysname(2,numone))],'YTickLabel',([sysname(2,numone)]));
+% set(gca,'ZTick',flip([length(density_matrixnew)-Fitted_Subgroup]),'ZTickLabel',[8 6 5 4 3.5 3 2.5 2 1.5 1 0.5 0]);
+% title('P matrix of slopes');
+% % 设置视角
+% view(3); % 3D 视角
+% 
+% % 移除边缘线
+% for i = 1:numel(h)
+%     set(h(i), 'EdgeColor', 'none');
+% end
+% 
+% set(gcf,'Color',[1 1 1]) ;
+% set(gcf,'position', [1 70 970 800]);
+% set(gcf, 'PaperPositionMode', 'auto');set(gca, 'fontsize',12,'LineWidth',0.1,'FontWeight','bold');
+% print(gcf,'-dtiff','-r300',[result_namethre 'Slopelinematrix_VonEc.tif']); close all;
 
-for agei=1:length(Gradeintsall);
+
+%pmap 圆形 平均速率
+
+% for agei=1:length(Gradeintsall);
+for agei=1;
 colornode(indnodes)=Gradeintsall(:,agei);
+colornodemean=zeros(500,1);colornodemediation=zeros(500,1);
 colornodemean(indnodes)=Mean_rapid_slope;
 colornodemediation(indnodes)=Median_rapid_slope;
 
@@ -587,60 +716,37 @@ pVonEmdnew=pVonEmd(numone,numone,agei);
 pVonEmdplot=-log(pVonEmdnew);
 pVonEmdplot(find(pVonEmdnew==999))=0;
 pall=[];
-pall=pVonEnew(intersect((find(triu(pVonEnew)>0)),(find(triu(pVonEnew)<1))));
+pall=pVonEmnew(intersect((find(triu(pVonEmnew)>0)),(find(triu(pVonEmnew)<1))));
 [pmmfdr1 pmmfdr2]=gretna_FDR(pall,0.05);
+pthrenode=0.05;
 if(isempty(pmmfdr1))
     pVonEplot=zeros(size(numone,1),size(numone,1));
 else
-pVonEplot(find(pVonEnew>=(pmmfdr1)))=0;
+pVonEplot(find(pVonEnew>=(pthrenode)))=0;
+pVonEmplot(find(pVonEmnew>=(pthrenode)))=0;
+pVonEmdplot(find(pVonEmdnew>=(pthrenode)))=0;
 end
 pVonEplotall(:,:,agei)=pVonEplot;
-
+pVonEmplotall(:,:,agei)=pVonEmplot;
+pVonEmdplotall(:,:,agei)=pVonEmdplot;
+pVonEmnewall(:,:,agei)=pVonEmnew;
+pVonEmdnewall(:,:,agei)=pVonEmdnew;
 end
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%VonE system slope stats  Pmap plot
-% 创建一个示例的 3D 密度分布矩阵，这里用随机数据代替
-density_matrix = pVonEplotall(:,:,1:end);
-density_matrixnew=[];
-for i=1:length(density_matrix)
-    density_matrixnew(:,:,i)=density_matrix(:,:,(length(density_matrix)-i)+1);
-end
-% 创建一个新的 figure
-figure;
-
-% 创建切片图像
-h = slice(density_matrixnew, [], [], 1:size(density_matrixnew, 3));
-
-% 设置绘图属性和标签
-zlabel('Age');
-set(gca,'XTick',[1:1:length(sysname(2,numone))],'XTickLabel',[sysname(2,numone)]);
-set(gca,'YTick',[1:1:length(sysname(2,numone))],'YTickLabel',([sysname(2,numone)]));
-set(gca,'ZTick',flip([length(density_matrixnew)-Fitted_Subgroup]),'ZTickLabel',[8 6 5 4 3.5 3 2.5 2 1.5 1 0.5 0]);
-title('P matrix of slopes');
-% 设置视角
-view(3); % 3D 视角
-
-% 移除边缘线
-for i = 1:numel(h)
-    set(h(i), 'EdgeColor', 'none');
-end
-
-set(gcf,'Color',[1 1 1]) ;
-set(gcf,'position', [1 70 970 800]);
-set(gcf, 'PaperPositionMode', 'auto');set(gca, 'fontsize',12,'LineWidth',0.1,'FontWeight','bold');
-print(gcf,'-dtiff','-r300',[result_namethre 'Slopelinematrix_VonEc.tif']); close all;
-
-
-%pmap 圆形 平均速率
-pallm=pVonEmnew(intersect((find(triu(pVonEmnew)>0)),(find(triu(pVonEmnew)<1))));
-[pmmmfdr1 pmmmfdr2]=gretna_FDR(pallm,0.05);
-pVonEmplot(find(pVonEmnew>pmmmfdr1))=0;
-%yuan
-pallmd=pVonEmdnew(intersect((find(triu(pVonEmdnew)>0)),(find(triu(pVonEmdnew)<1))));
-[pmmmdfdr1 pmmmdfdr2]=gretna_FDR(pallmd,0.05);
-pVonEmdplot(find(pVonEmdnew>pmmmdfdr1))=0;
+% 
+% pVonEmnew=pVonEmnewall(:,:,end);
+% pallm=pVonEmnew(intersect((find(triu(pVonEmnew)>0)),(find(triu(pVonEmnew)<1))));
+% [pmmmfdr1 pmmmfdr2]=gretna_FDR(pallm,0.05);
+% pmmmfdr1=0.01;
+% pVonEmplot=pVonEmplotall(:,:,end);
+% pVonEmplot(find(pVonEmnew>pmmmfdr1))=0;
+% 
+% pVonEmdnew=pVonEmdnewall(:,:,end);
+% pallmd=pVonEmdnew(intersect((find(triu(pVonEmdnew)>0)),(find(triu(pVonEmdnew)<1))));
+% [pmmmdfdr1 pmmmdfdr2]=gretna_FDR(pallmd,0.05);
+% pmmmdfdr1=0.01;
+% pVonEmdplot=pVonEmdplotall(:,:,end);
+% pVonEmdplot(find(pVonEmdnew>pmmmdfdr1))=0;
 
 % 创建一个绘图函数，只在圆内填充伪彩色的颜色
 figure;
@@ -736,7 +842,7 @@ end
 % end
 x=[];g=[];
 for ii=1:size(PerVonEmslop,2)
-x = [x PerVonEmslop{1,ii}];
+x = [x; PerVonEmslop{1,ii}];
 gt = repmat({[sysname{2,ii}]},length(PerVonEmslop{1,ii}),1);
 g=[g; gt];
 end
@@ -754,11 +860,14 @@ print(gcf,'-dtiff','-r300',[result_namethre 'VonE_meanSlope_voilin.tif']); close
 
 
 %%%%%%%%%%%%%%%%%%%%%
-%SVR
-load([Pathnew(1:end-20),'\Gretna_results\par500FN\NodalEfficiency\NodalEfficiency.mat']);
-nodal_eff=Ne';
+% %SVR
+% % load([Pathnew(1:end-20),'\Gretna_results\par500FN\NodalEfficiency\NodalEfficiency.mat']);
+% % nodal_eff=Ne';
+
+% nodal_eff=Nodal_metric';
+% finalYCorr=mean(nodal_eff(:,find((Age>7.5)&(Age<=9))),2);
+load([Pathnewplot 'Forprediction_finalYCorr.mat'])
 dirsvr=(Pathnewplot);
-finalYCorr=mean(nodal_eff(:,find((Age>7)&(Age<=9))),2);
 regionalcorrsvr(indnodes,Fitted_Subgroup,Age2,roi_num,Gradeintsall,finalYCorr,typeofstat,result_namethre,'SVR_Ageat8ys',[],dirsvr);
 
 

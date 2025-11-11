@@ -1,4 +1,4 @@
-function corrstats=surf_sig_roi_corr(Mean_rapid_slope,indnodes,cifti_scalar,Xlabels,Ylablels,namef,Pathnew)
+function corrstats=surf_sig_roi_corr_cov(Mean_rapid_slope,indnodes,cifti_scalar,Xlabels,Ylablels,namef,Pathnew,Cov)
 lhgii=[Pathnew,'\Forgithub\Data\Atlas\Par_500_fslr-lh.gii'];
 rhgii=[Pathnew,'\Forgithub\Data\Atlas\Par_500_fslr-rh.gii'];
 %cifti_scalar=['D:\Documents\OneDrive - bnu.edu.cn\My_publications\0-8years\atlases_Oct2023\atlases_Jan1220\ted\S-A_ArchetypalAxis-main\FSLRVertex\Cortical.Thickness.dscalar.nii'];
@@ -56,6 +56,6 @@ Mean_rapid_slopecorr=Mean_rapid_slope';
 Mean_rapid_slopecorr(zerosind)=[];
 Sig_scacorr=Sig_sca;
 Sig_scacorr(zerosind)=[];
-%cov(zerosind,:)=[];
-corrstats = corrstat(Mean_rapid_slopecorr,Sig_scacorr,[]);
+Cov(zerosind,:)=[];
+corrstats = corrstat(Mean_rapid_slopecorr,Sig_scacorr,Cov);
 %corrplot(Mean_rapid_slopecorr,corrstats,Xlabels,Ylablels,[],[],[],[],[],[namef,'.tif'])

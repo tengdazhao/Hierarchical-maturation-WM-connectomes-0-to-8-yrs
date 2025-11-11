@@ -1,4 +1,4 @@
-function nodal_stats(NodalStr,Age_gender,Brainsz,Pathnewxsl,opthub,Pathnewplot,Scalev1,Nname,netname,indall_select,betainitial,plotornot,fdrbon);
+function multicenter_nodal_stats(NodalStr,Age_gender,Brainsz,Pathnewxsl,opthub,Pathnewplot,Scalev1,Nname,netname,indall_select,betainitial,plotornot,fdrbon,Site_info);
 % %sort
 Strsort=[];indstr=[];indstrre=[];re=[];
 roi_num=size(NodalStr,2);
@@ -40,7 +40,7 @@ save(fileforsavename,'indminNodalStr','indminNodalStrmdall','notenoughNodalStr')
 
 load(fileforsavename);
 result_name=[Nname,'Str'];
-FourModelsigthre=arrange_nodal(indminNodalStrmdall,indminNodalStr,notenoughNodalStr,Pathnewxsl,opthub,Scalev1,Pathnewplot,result_name,plotornot,fdrbon);
+FourModelsigthre=arrange_nodal_multi(indminNodalStrmdall,indminNodalStr,notenoughNodalStr,Pathnewxsl,opthub,Scalev1,Pathnewplot,result_name,plotornot,fdrbon,Site_info);
 
 fileforsavename=[Pathnewplot,'FourModelsigthre',Nname,'Str',netname,'.mat'];
 save(fileforsavename,'FourModelsigthre');
