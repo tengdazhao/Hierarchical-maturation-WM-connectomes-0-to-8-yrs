@@ -5,7 +5,18 @@ statdir=[Pathnew,'Forgithub\Code'];
 savedir=[Pathnew,'Forgithub'];
 Pathnewplot=[Pathnew,'Forgithub'];
 cd(Pathnewplot)
-load([Pathnew,'Forgithub\Data\Gretna_results\par500FN\NodalEfficiency\NodalEfficiency.mat']);
+
+load([Pathnew,'Forgithub\Data\Gretna_results\Subset1\gretna_results_subset1.mat']);
+load([Pathnew,'Forgithub\Data\Network\Subset1\Matrixallpar500FN_subset1.mat']);
+
+Matrixallpar500FN=Matrixallpar500FN_subset1;
+Age_gender=Age_gender_Brainsize_subset1(:,1:2);
+Brainsz=Age_gender_Brainsize_subset1(:,3);
+Eg=Eg_subset1;
+Eloc=Eloc_subset1;
+Ne=Ne_subset1;
+
+
 plotornot=1;
 
 

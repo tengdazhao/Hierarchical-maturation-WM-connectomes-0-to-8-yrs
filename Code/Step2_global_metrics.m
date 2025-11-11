@@ -1,11 +1,18 @@
-%Global metrics
-
+%Global metrics 
+% using subset1 as an example
+% For multicenter fitting, using multi_center_multimodelnlm_global.m instead of multimodelnlm_global.m
+% For multicenter fitting, network atrriobutes should be harmonized (Adj_site_effect.m) before using multi_center_multimodelnlm_global.m
+% 
 
 % load graph theoritical measurements
-load([Pathnew,'Forgithub\Data\Gretna_results\par500FN\DegreeCentrality\DegreeCentrality.mat']);
-load([Pathnew,'Forgithub\Data\Gretna_results\par500FN\SmallWorld\SmallWorld.mat']);
-load([Pathnew,'Forgithub\Data\Gretna_results\par500FN\NetworkEfficiency\NetworkEfficiency.mat']);
-load([Pathnew,'Forgithub\Data\Gretna_results\par500FN\NodalEfficiency\NodalEfficiency.mat']);
+load([Pathnew,'Forgithub\Data\Gretna_results\Subset1\gretna_results_subset1.mat']);
+load([Pathnew,'Forgithub\Data\Network\Subset1\Matrixallpar500FN_subset1.mat']);
+
+Matrixallpar500FN=Matrixallpar500FN_subset1;
+Age_gender=Age_gender_Brainsize_subset1(:,1:2);
+Brainsz=Age_gender_Brainsize_subset1(:,3);
+Eg=Eg_subset1;
+Eloc=Eloc_subset1;
 
 
 [roi_num]=size(Matrixallpar500FN{1,1},2);
@@ -28,54 +35,21 @@ end
 
 Age_gender_sp=[Age_gender Sp];
 
-[indminEg mdallEg notEg]=multimodelnlm_global(Age_gender_sp,Brainsz,Eg,'Csp Global Eff',plotornot,indall_select,1)
-[indminEloc mdallEloc notEloc]=multimodelnlm_global(Age_gender_sp,Brainsz,Eloc,'Csp Local_E',plotornot,indall_select,1)
-[indminGamma mdallGamma notGamma]=multimodelnlm_global(Age_gender_sp,Brainsz,Gamma,'Csp Gamma',plotornot,indall_select,1)
-[indminLambda mdallLambda notLambda]=multimodelnlm_global(Age_gender_sp,Brainsz,Lambda,'Csp Lambda',plotornot,indall_select,1)
-[indminSigma mdallSigma notSigma]=multimodelnlm_global(Age_gender_sp,Brainsz,Sigma,'Csp Sigma',plotornot,indall_select,1)
-
-%robustness
-allrob=[];
-allrob=dir([Pathnew,'Forgithub\Data\Gretna_results\Par500FN\Robustness\*.mat']);
-TargetLargeComSizeall=[];TargetLpall=[];RandomLargeComSizeall=[];RandomLpall=[];
-LarComSize=[];Lp=[];
-for i =1:size(allrob,1);
-load([allrob(i).folder,'\',allrob(i).name]);
-TargetLargeComSizeall(:,i) =[LarComSize.targetattack,zeros(1,roi_num-length(LarComSize.targetattack))];
-TargetLpall(:,i) =[Lp.targetattack,zeros(1,roi_num-length(Lp.targetattack))];
-RandomLargeComSizeall(:,i) =[LarComSize.randomattack,zeros(1,roi_num-length(LarComSize.randomattack))];
-RandomLpall(:,i) =[Lp.randomattack,zeros(1,roi_num-length(Lp.randomattack))];
-end
-
-TargetEffall=1./TargetLpall;
-RandomEffall=1./RandomLpall;
-TargetEffall(find(TargetEffall==Inf))=0;
-RandomEffall(find(RandomEffall==Inf))=0;
-
-AUC_Eff_target =sum(TargetEffall./500,1);
-AUC_Eff_random =sum(RandomEffall./500,1);
-
-AUC_LCC_target =sum(TargetLargeComSizeall./500,1);
-AUC_LCC_random =sum(RandomLargeComSizeall./500,1);
-
-[indmintarget mdalltarget notEtarget]=multimodelnlm_global(Age_gender_sp,Brainsz,AUC_Eff_target','Csp AUC Eff target',plotornot,indall_select,1)
-[indminrandom mdallrandom notrandom]=multimodelnlm_global(Age_gender_sp,Brainsz,AUC_Eff_random','Csp AUC Eff random',plotornot,indall_select,1)
+[indminEg mdallEg notEg]=multimodelnlm_global(Age_gender_sp,Brainsz,Eg,'Global Eff',plotornot,indall_select,1)
+[indminEloc mdallEloc notEloc]=multimodelnlm_global(Age_gender_sp,Brainsz,Eloc,'Local_E',plotornot,indall_select,1)
 
 
 %growth rates
-h=plot(mdallEg{2,indminEg(1,1)},Age,mdallEg{1,indminEg(1,1)}.Fitted, 'predobs');
+Age=Age_gender(indall_select,1)./30./12;
+%%%Slope global
+h=plot(mdallEg{1,1}{2,indminEg(1,1)},Age,mdallEg{1,1}{1,indminEg(1,1)}.Fitted, 'predfun');
 hxvalue(:,1)=h(2,1).XData;hyvalue(:,1)=h(2,1).YData;hyhvalue(:,1)=h(3,1).YData;hylvalue(:,1)=h(4,1).YData;
-h=plot(mdallEloc{2,indminEloc(1,1)},Age,mdallEloc{1,indminEloc(1,1)}.Fitted, 'predobs');hold on;
+h=plot(mdallEloc{1,1}{2,indminEloc(1,1)},Age,mdallEloc{1,1}{1,indminEloc(1,1)}.Fitted, 'predfun');hold on;
 hxvalue(:,2)=h(2,1).XData;hyvalue(:,2)=h(2,1).YData;hyhvalue(:,2)=h(3,1).YData;hylvalue(:,2)=h(4,1).YData;
-h=plot(mdallGamma{2,indminGamma(1,1)},Age,mdallGamma{1,indminGamma(1,1)}.Fitted, 'predobs');hold on;
-hxvalue(:,3)=h(2,1).XData;hyvalue(:,3)=h(2,1).YData;hyhvalue(:,3)=h(3,1).YData;hylvalue(:,3)=h(4,1).YData;
-h=plot(mdallSigma{2,indminSigma(1,1)},Age,mdallSigma{1,indminSigma(1,1)}.Fitted, 'predobs');hold on;
-hxvalue(:,4)=h(2,1).XData;hyvalue(:,4)=h(2,1).YData;hyhvalue(:,4)=h(3,1).YData;hylvalue(:,4)=h(4,1).YData;
-h=plot(mdalltarget{2,indmintarget(1,1)},Age,mdalltarget{1,indmintarget(1,1)}.Fitted, 'predobs');hold on;
-hxvalue(:,5)=h(2,1).XData;hyvalue(:,5)=h(2,1).YData;hyhvalue(:,5)=h(3,1).YData;hylvalue(:,5)=h(4,1).YData;
+
 close all
 Gradeintsall=[];Gradeintshall=[];Gradeintslall=[];
-for ii=1:5
+for ii=1:2
 Dx=diff(hxvalue(:,ii));
 Dy=diff(hyvalue(:,ii));
 Dxy=Dy./Dx;
@@ -104,27 +78,15 @@ hnew=plot(hxvalue(2:end,:),Gradeintsall);
 
 set(hnewh(2),'LineWidth',0.5,'LineStyle','-','color',[255/255 255/255 255/255]);
 set(hnewh(1),'LineWidth',0.5,'LineStyle','-','color',[255/255    255/255    254/255]);
-set(hnewh(5),'LineWidth',0.5,'LineStyle','-','color',[255/255    255/255    255/255]);
-set(hnewh(3),'LineWidth',0.5,'LineStyle','-','color',[255/255    255/255    255/255]);
-set(hnewh(4),'LineWidth',0.5,'LineStyle','-','color',[255/255    255/255    255/255]);
 
 set(hnewl(2),'LineWidth',0.5,'LineStyle','-','color',[255/255 255/255 255/255]);
 set(hnewl(1),'LineWidth',0.5,'LineStyle','-','color',[255/255    255/255    255/255]);
-set(hnewl(5),'LineWidth',0.5,'LineStyle','-','color',[255/255    255/255    255/255]);
-set(hnewl(3),'LineWidth',0.5,'LineStyle','-','color',[255/255    255/255    255/255]);
-set(hnewl(4),'LineWidth',0.5,'LineStyle','-','color',[255/255    255/255    255/255]);
 % 
 fill([hnewh(2).XData,fliplr(hnewh(2).XData)],[hnewh(2).YData,fliplr(hnewl(2).YData)],[227/255 150/255 120/255],'EdgeColor','none','FaceAlpha',0.5);%画填充颜色
 fill([hnewh(1).XData,fliplr(hnewh(1).XData)],[hnewh(1).YData,fliplr(hnewl(1).YData)],[254/255    210/255    150/255],'EdgeColor','none','FaceAlpha',0.5);%画填充颜色
-fill([hnewh(5).XData,fliplr(hnewh(5).XData)],[hnewh(5).YData,fliplr(hnewl(5).YData)],[120/255    226/255    200/255],'EdgeColor','none','FaceAlpha',0.5);%画填充颜色
-fill([hnewh(3).XData,fliplr(hnewh(3).XData)],[hnewh(3).YData,fliplr(hnewl(3).YData)],[255/255     169/255    160/255],'EdgeColor','none','FaceAlpha',0.5);%画填充颜色
-fill([hnewh(4).XData,fliplr(hnewh(4).XData)],[hnewh(4).YData,fliplr(hnewl(4).YData)],[255/255     169/255    160/255],'EdgeColor','none','FaceAlpha',0.5);%画填充颜色
 
 set(hnew(2),'LineWidth',2.5,'LineStyle','-','color',[227/255 68/255 10/255]);
 set(hnew(1),'LineWidth',2.5,'LineStyle','-','color',[254/255    157/255    46/255]);
-set(hnew(5),'LineWidth',2.5,'LineStyle','-','color',[55/255    226/255    147/255]);
-set(hnew(3),'LineWidth',2.5,'LineStyle','-','color',[42/255    83/255    224/255]);
-set(hnew(4),'LineWidth',2.5,'LineStyle','-','color',[10/255    10/255    200/255]);
 
 xlabel( 'Age','FontSize',52);
 ylabel('Developmental velocity','FontSize',52);
